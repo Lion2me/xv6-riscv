@@ -168,6 +168,7 @@ freeproc(struct proc *p)
   p->chan = 0;
   p->killed = 0;
   p->xstate = 0;
+  p->priority = 2;
   p->state = UNUSED;
 }
 
@@ -316,6 +317,7 @@ fork(void)
 
   acquire(&wait_lock);
   np->parent = p;
+  np->priority = p->priority;
   release(&wait_lock);
 
   acquire(&np->lock);
@@ -680,4 +682,15 @@ procdump(void)
     printf("%d %s %s", p->pid, state, p->name);
     printf("\n");
   }
+}
+
+// This is nice function
+// 
+void
+nice(int priority)
+{
+  struct proc *p = myproc();
+  acquire(&p->lock);
+  p->priority = priority;
+  release(&p->lock);
 }
